@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inside — Diptyque & Le Labo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=Space+Mono:wght@400;700&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden}
+    body{
+      background:#080603;
+      color:#f5f0e8;
+      font-family:'Space Mono',monospace;
+      cursor:none;
+    }
+
+    #cur{
+      position:fixed;width:12px;height:12px;
+      border-radius:50%;background:rgba(255,255,255,.9);
+      mix-blend-mode:difference;pointer-events:none;
+      z-index:9999;transform:translate(-50%,-50%);
+      transition:width .15s,height .15s;
+    }
+    #cur.big{width:44px;height:44px}
+
+    /* ENTRY SCREEN */
+    .entry{
+      height:100vh;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      position:relative;
+    }
+
+    .door{
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      gap:20px;padding:60px 40px;
+      overflow:hidden;position:relative;
+      transition:flex .65s cubic-bezier(.4,0,.2,1);
+      cursor:none;text-decoration:none;color:inherit;
+    }
+    .door:hover{flex:1.45}
+
+    #dl{
+      background:
+        radial-gradient(ellipse 55% 45% at 50% 25%,rgba(240,185,90,.14) 0%,transparent 65%),
+        #100c04;
+    }
+    #dr{
+      background:
+        radial-gradient(ellipse 45% 50% at 50% 35%,rgba(255,170,60,.1) 0%,transparent 60%),
+        #060d06;
+    }
+
+    .seam{
+      position:absolute;left:50%;top:8%;bottom:8%;
+      width:1px;background:rgba(255,255,255,.12);
+      transform:translateX(-50%);z-index:5;
+    }
+
+    .eyebrow{font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;opacity:.3;margin-bottom:4px}
+
+    #dl .brand-name{
+      font-family:'Space Mono',monospace;font-weight:700;
+      font-size:clamp(2.4rem,5.5vw,5rem);
+      color:#d4aa72;line-height:1;text-align:center;
+    }
+    #dr .brand-name{
+      font-family:'Playfair Display',serif;font-style:italic;
+      font-size:clamp(2.4rem,5.5vw,5rem);
+      color:#7aab7a;text-align:center;
+    }
+
+    .door-copy{
+      font-size:.7rem;line-height:1.65;opacity:0;
+      transform:translateY(10px);text-align:center;max-width:240px;
+      transition:opacity .35s,transform .35s;
+    }
+    .door:hover .door-copy{opacity:.45;transform:translateY(0)}
+
+    .enter-btn{
+      margin-top:8px;padding:11px 28px;
+      border:1px solid rgba(255,255,255,.22);
+      background:none;color:rgba(255,255,255,.5);
+      font-family:'Space Mono',monospace;font-size:.62rem;
+      letter-spacing:.18em;text-transform:uppercase;
+      cursor:none;transition:border-color .2s,color .2s,background .2s;
+      text-decoration:none;display:inline-block;
+    }
+    .enter-btn:hover{border-color:rgba(255,255,255,.65);color:#fff;background:rgba(255,255,255,.05)}
+
+    /* floating scent words */
+    .ptcl-wrap{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .ptcl{
+      position:absolute;font-size:.55rem;letter-spacing:.12em;
+      text-transform:uppercase;opacity:0;
+      animation:drift var(--d) var(--delay) infinite ease-in-out;
+    }
+    @keyframes drift{
+      0%{opacity:0;transform:translateY(24px) rotate(var(--r0))}
+      18%{opacity:.65}80%{opacity:.2}
+      100%{opacity:0;transform:translateY(-80px) rotate(var(--r1))}
+    }
+
+    /* bottom hint */
+    .hint{
+      position:fixed;bottom:28px;left:50%;
+      transform:translateX(-50%);
+      font-size:.55rem;letter-spacing:.18em;opacity:.18;
+      animation:bob 2.6s ease-in-out infinite;z-index:6;
+      white-space:nowrap;
+    }
+    @keyframes bob{
+      0%,100%{transform:translateX(-50%) translateY(0)}
+      50%{transform:translateX(-50%) translateY(7px)}
+    }
+
+    /* page-enter transition */
+    body.leaving{animation:leaveOut .45s ease forwards}
+    @keyframes leaveOut{to{opacity:0;transform:scale(1.03)}}
+
+    /* top right note */
+    .study-label{
+      position:fixed;top:28px;right:32px;
+      font-size:.52rem;letter-spacing:.18em;opacity:.18;z-index:10;
+    }
+    .notes-link{
+      position:fixed;bottom:28px;right:32px;
+      font-size:.55rem;letter-spacing:.14em;opacity:.25;
+      color:inherit;text-decoration:none;
+      transition:opacity .2s;cursor:none;
+      z-index:10;
+    }
+    .notes-link:hover{opacity:.6}
+
+    @media(max-width:600px){
+      .entry{grid-template-columns:1fr;height:auto;min-height:100vh}
+      .door{min-height:50vh}
+      .seam{display:none}
+      html,body{overflow:auto}
+    }
+  </style>
+</head>
+<body>
+<div id="cur"></div>
+<div class="study-label">INTERIOR STUDY — 2026</div>
+<a class="notes-link" href="notes.html">Field Notes ↗</a>
+
+<div class="entry">
+  <div class="seam"></div>
+
+  <a class="door" id="dl" href="le-labo.html">
+    <div class="ptcl-wrap" id="ll-ptcl"></div>
+    <div class="eyebrow">Est. 2006 · New York</div>
+    <div class="brand-name">Le<br>Labo</div>
+    <p class="door-copy">Raw oils. Kraft tape. Stamped in front of you.<br>A perfume that reacts to your skin.</p>
+    <span class="enter-btn">Enter the lab ↓</span>
+  </a>
+
+  <a class="door" id="dr" href="diptyque.html">
+    <div class="ptcl-wrap" id="dip-ptcl"></div>
+    <div class="eyebrow">Est. 1961 · Paris</div>
+    <div class="brand-name">Diptyque</div>
+    <p class="door-copy">Ink into water. A brush on paper.<br>Scent as mark-making. Come in and warm up.</p>
+    <span class="enter-btn">Enter the salon ↓</span>
+  </a>
+</div>
+
+<div class="hint">choose a door</div>
+
+<script>
+const cur = document.getElementById('cur');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+document.addEventListener('mousedown', () => cur.classList.add('big'));
+document.addEventListener('mouseup',   () => cur.classList.remove('big'));
+
+// page-leave fade
+document.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const href = a.href;
+    document.body.classList.add('leaving');
+    setTimeout(() => { window.location = href; }, 440);
+  });
+});
+
+// particles
+const llW = ['SANTAL','BERGAMOTE','VETIVER','LABDANUM','AMBRETTE','OUD','IRIS','MUSCS','ROSE 31'];
+const dipW = ['Hespérides','Do Son','Fleur de Peau','Orphéon','Figuier','Vetyverio','Olène'];
+
+function spawn(id, words, color) {
+  const wrap = document.getElementById(id);
+  words.forEach((w, i) => {
+    const s = document.createElement('span');
+    s.className = 'ptcl';
+    s.textContent = w;
+    s.style.cssText = `left:${8+Math.random()*84}%;bottom:${10+Math.random()*70}%;color:${color};--d:${7+Math.random()*5}s;--delay:${i*.85}s;--r0:${(Math.random()*8-4).toFixed(1)}deg;--r1:${(Math.random()*8-4).toFixed(1)}deg`;
+    wrap.appendChild(s);
+  });
+}
+spawn('ll-ptcl',  llW,  'rgba(212,170,114,.55)');
+spawn('dip-ptcl', dipW, 'rgba(122,171,122,.55)');
+</script>
+</body>
+</html>

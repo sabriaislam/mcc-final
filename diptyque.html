@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Diptyque — Interior Study</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,600&family=Space+Mono:wght@400;700&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+
+    body{
+      background:#060d06;
+      color:#e8f0e8;
+      font-family:'Playfair Display',serif;
+      cursor:none;
+      overflow-x:hidden;
+    }
+
+    /* ── cursor ── */
+    #cur{
+      position:fixed;width:10px;height:16px;
+      border-radius:50% 50% 60% 60%;
+      background:rgba(122,171,122,.8);
+      mix-blend-mode:normal;pointer-events:none;z-index:9999;
+      transform:translate(-50%,-50%);
+      transition:width .18s,height .18s,border-radius .18s;
+    }
+    #cur.wide{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.85);mix-blend-mode:difference}
+
+    /* ── nav ── */
+    nav{
+      position:fixed;top:0;left:0;right:0;z-index:100;
+      display:flex;align-items:center;gap:0;padding:0 40px;height:52px;
+      background:linear-gradient(to bottom,rgba(6,13,6,1) 0%,rgba(6,13,6,0) 100%);
+    }
+    nav a{
+      color:rgba(200,220,200,.3);text-decoration:none;
+      font-family:'Space Mono',monospace;font-size:.55rem;
+      letter-spacing:.18em;text-transform:uppercase;
+      padding:6px 16px;cursor:none;transition:color .2s;
+    }
+    nav a:hover,nav a.active{color:#7aab7a}
+    nav .back{margin-right:auto;color:rgba(200,220,200,.22)}
+    nav .back:hover{color:rgba(200,220,200,.55)}
+
+    /* ── HERO ── */
+    .room-hero{
+      min-height:100vh;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      position:relative;overflow:hidden;
+      background:
+        radial-gradient(ellipse 50% 60% at 80% 20%,rgba(255,179,71,.13) 0%,transparent 55%),
+        radial-gradient(ellipse 60% 40% at 20% 80%,rgba(122,171,122,.07) 0%,transparent 50%),
+        #060d06;
+      padding:100px 40px 80px;
+    }
+
+    /* candle top-right */
+    .candle-scene{
+      position:absolute;top:80px;right:80px;
+      display:flex;flex-direction:column;align-items:center;gap:0;
+    }
+    .flame{
+      width:10px;height:22px;
+      background:radial-gradient(ellipse at 50% 80%,#fff8c0 0%,#ffb347 55%,transparent 100%);
+      border-radius:50% 50% 30% 30%;
+      animation:flicker 1.9s ease-in-out infinite;
+      filter:blur(.4px);
+    }
+    @keyframes flicker{
+      0%,100%{transform:scaleX(1) scaleY(1) rotate(-.5deg)}
+      30%{transform:scaleX(.88) scaleY(1.12) rotate(.6deg)}
+      60%{transform:scaleX(1.06) scaleY(.93) rotate(-.3deg)}
+      80%{transform:scaleX(.94) scaleY(1.06) rotate(.8deg)}
+    }
+    .candle-body{
+      width:14px;height:65px;
+      background:linear-gradient(to right,#e8e0d0,#f5f0e5,#ddd8c8);
+      border-radius:2px 2px 1px 1px;
+    }
+    .candle-glow{
+      position:absolute;top:-4px;left:50%;transform:translateX(-50%);
+      width:50px;height:50px;border-radius:50%;
+      background:radial-gradient(circle,rgba(255,195,70,.3) 0%,transparent 70%);
+      animation:glowPulse 2.1s ease-in-out infinite;
+    }
+    @keyframes glowPulse{
+      0%,100%{transform:translateX(-50%) scale(1);opacity:1}
+      50%{transform:translateX(-50%) scale(1.18);opacity:.75}
+    }
+
+    /* ink drips background */
+    .ink-layer{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+    .ink-drip{
+      position:absolute;
+      border-radius:50%;
+      background:rgba(122,171,122,.06);
+      animation:inkExpand var(--d) var(--delay) infinite ease-out;
+    }
+    @keyframes inkExpand{
+      0%{transform:scale(0);opacity:1}
+      100%{transform:scale(1);opacity:0}
+    }
+
+    .hero-eyebrow{font-size:.58rem;letter-spacing:.22em;opacity:.3;margin-bottom:18px;font-family:'Space Mono',monospace}
+    .hero-title{
+      font-family:'Playfair Display',serif;font-style:italic;
+      font-size:clamp(3rem,8vw,7rem);
+      color:#7aab7a;text-align:center;line-height:1;
+    }
+    .hero-sub{
+      font-family:'Caveat',cursive;font-size:1.2rem;
+      line-height:1.7;opacity:.45;text-align:center;
+      max-width:380px;margin-top:24px;
+    }
+    .hero-scroll{
+      margin-top:48px;font-family:'Space Mono',monospace;
+      font-size:.55rem;letter-spacing:.2em;opacity:.2;
+      animation:bob 2.4s ease-in-out infinite;
+    }
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(8px)}}
+
+    /* brush stroke under title */
+    .brush-stroke{
+      width:200px;height:6px;margin:12px auto 0;
+      background:linear-gradient(90deg,transparent,rgba(122,171,122,.4),transparent);
+      border-radius:50%;
+    }
+
+    /* ── section shared ── */
+    section{padding:100px 64px;position:relative}
+    section h2{
+      font-style:italic;
+      font-size:clamp(1.6rem,3vw,2.8rem);
+      color:#7aab7a;margin-bottom:10px;
+    }
+    .s-sub{
+      font-family:'Space Mono',monospace;
+      font-size:.62rem;letter-spacing:.14em;opacity:.3;margin-bottom:48px;
+    }
+
+    /* ── BOTTLE SECTION ── */
+    #bottles{
+      background:
+        radial-gradient(ellipse 60% 40% at 70% 100%,rgba(255,179,71,.08) 0%,transparent 55%),
+        #04090a;
+    }
+
+    .bottle-shelf{
+      display:flex;gap:56px;flex-wrap:wrap;
+      justify-content:center;align-items:flex-end;
+      padding:20px 0 60px;
+      position:relative;
+    }
+    .bottle-shelf::after{
+      content:'';position:absolute;bottom:0;left:0;right:0;
+      height:2px;
+      background:linear-gradient(90deg,transparent,rgba(122,171,122,.3) 20%,rgba(122,171,122,.3) 80%,transparent);
+      box-shadow:0 4px 20px rgba(122,171,122,.1);
+    }
+
+    .bottle-card{
+      display:flex;flex-direction:column;align-items:center;
+      gap:0;position:relative;cursor:none;width:200px;
+    }
+
+    .bottle-img-wrap{
+      position:relative;
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .bottle-img-wrap:hover{transform:translateY(-14px)}
+
+    .bottle-img{
+      width:150px;height:220px;object-fit:contain;display:block;
+      filter:drop-shadow(0 10px 30px rgba(0,0,0,.55));
+      transition:filter .3s;
+    }
+    .bottle-img-wrap:hover .bottle-img{
+      filter:drop-shadow(0 20px 50px rgba(122,171,122,.35));
+    }
+
+    .bottle-glow{
+      position:absolute;bottom:-18px;left:50%;
+      transform:translateX(-50%);
+      width:90px;height:20px;
+      background:radial-gradient(ellipse,rgba(122,171,122,.4) 0%,transparent 70%);
+      opacity:0;transition:opacity .35s;pointer-events:none;
+    }
+    .bottle-img-wrap:hover .bottle-glow{opacity:1}
+
+    /* ink-annotation panel */
+    .bottle-label{
+      background:#0a150a;border-top:2px solid rgba(122,171,122,.25);
+      padding:18px 16px;width:100%;text-align:center;
+    }
+    .bottle-name{
+      font-style:italic;font-size:1.05rem;
+      color:#7aab7a;margin-bottom:10px;
+    }
+    .notes-pyramid{margin-top:8px;display:flex;flex-direction:column;gap:7px}
+    .note-row{display:flex;align-items:baseline;gap:8px}
+    .note-tier{
+      font-family:'Space Mono',monospace;font-size:.46rem;
+      letter-spacing:.14em;text-transform:uppercase;opacity:.3;width:32px;flex-shrink:0;
+    }
+    .note-words{font-family:'Caveat',cursive;font-size:.9rem;opacity:.5;line-height:1.3}
+
+    /* annotation on hover */
+    .annotation{
+      position:absolute;left:105%;top:20px;
+      background:rgba(10,21,10,.9);
+      border-left:2px solid rgba(122,171,122,.4);
+      padding:10px 14px;min-width:160px;
+      font-family:'Caveat',cursive;font-size:.9rem;
+      line-height:1.5;color:rgba(200,230,200,.7);
+      opacity:0;transform:translateX(-8px);
+      transition:opacity .3s,transform .3s;
+      pointer-events:none;z-index:10;
+      white-space:normal;
+    }
+    .bottle-card:hover .annotation{opacity:1;transform:translateX(0)}
+
+    /* ink-btn */
+    .ink-btn{
+      margin-top:14px;width:100%;padding:8px;
+      border:1px solid rgba(122,171,122,.22);
+      background:transparent;color:rgba(122,171,122,.45);
+      font-family:'Space Mono',monospace;font-size:.55rem;
+      letter-spacing:.14em;text-transform:uppercase;cursor:none;
+      transition:border-color .2s,color .2s,background .2s;
+    }
+    .ink-btn:hover{border-color:rgba(122,171,122,.65);color:#7aab7a;background:rgba(122,171,122,.06)}
+
+    /* spray words */
+    .spray-word{
+      position:fixed;pointer-events:none;z-index:500;
+      font-family:'Caveat',cursive;font-size:1rem;
+      color:#7aab7a;
+      animation:wordFly var(--dur) ease-out forwards;opacity:0;
+    }
+    @keyframes wordFly{
+      0%{opacity:0;transform:translate(0,0) scale(.5)}
+      20%{opacity:.85}
+      100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(.9)}
+    }
+
+    #mood-flash{position:fixed;inset:0;pointer-events:none;z-index:400;opacity:0;transition:opacity .6s}
+
+    /* ── GALLERY ── */
+    #gallery{background:#060d07}
+
+    .tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:48px}
+    .tag{
+      padding:5px 14px;border-radius:99px;font-family:'Caveat',cursive;
+      font-size:.88rem;border:1px solid rgba(122,171,122,.3);color:rgba(122,171,122,.55);
+    }
+
+    /* gallery wall */
+    .gallery-wall{
+      background:linear-gradient(160deg,#f5f0e8 0%,#ede8dc 100%);
+      border-radius:3px;padding:52px 44px 60px;
+      box-shadow:0 8px 60px rgba(0,0,0,.55);
+    }
+    .scatter{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start}
+
+    .card{
+      flex:0 0 auto;width:200px;
+      background:#faf8f3;padding:10px 10px 30px;
+      box-shadow:2px 4px 20px rgba(0,0,0,.2);
+      transform:rotate(var(--r)) translateY(var(--ty,0px));
+      transition:transform .35s cubic-bezier(.34,1.56,.64,1),box-shadow .35s;
+      cursor:none;position:relative;
+    }
+    .card:hover{
+      transform:rotate(0deg) scale(1.07) translateY(-10px) !important;
+      box-shadow:6px 14px 44px rgba(0,0,0,.32);z-index:5;
+    }
+    .card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+    .card-num{
+      position:absolute;bottom:8px;left:0;right:0;
+      text-align:center;font-family:'Caveat',cursive;
+      font-size:.82rem;color:rgba(30,50,30,.38);
+    }
+    .heart{
+      position:absolute;top:13px;right:11px;font-size:.95rem;
+      opacity:0;transform:scale(0);pointer-events:none;
+      transition:opacity .25s,transform .35s cubic-bezier(.34,1.56,.64,1);z-index:3;
+    }
+    .card.loved .heart{opacity:1;transform:scale(1)}
+
+    /* ink ripple on click */
+    .ink-ring{
+      position:absolute;inset:0;
+      border-radius:0;pointer-events:none;z-index:3;
+      border:2px solid rgba(122,171,122,.5);
+      opacity:0;transform:scale(1);
+    }
+    .card.inked .ink-ring{animation:inkRipple .5s ease-out forwards}
+    @keyframes inkRipple{
+      0%{opacity:.8;transform:scale(1)}
+      100%{opacity:0;transform:scale(1.15)}
+    }
+
+    /* ── SALON NOTE ── */
+    #salon-note{background:#040a04;padding:80px 64px}
+    .type-block{max-width:560px;margin:0 auto;border-left:2px solid rgba(122,171,122,.2);padding-left:32px}
+    .type-block p{
+      font-family:'Caveat',cursive;font-size:1.25rem;
+      line-height:1.75;opacity:.5;margin-bottom:18px;
+    }
+    .type-block .author{font-family:'Space Mono',monospace;font-size:.58rem;letter-spacing:.18em;opacity:.22;margin-top:24px}
+
+    /* ── whisper ── */
+    #whisper{
+      position:fixed;bottom:72px;left:50%;
+      transform:translateX(-50%) translateY(16px);
+      background:rgba(4,10,4,.95);border:1px solid rgba(122,171,122,.3);
+      padding:11px 22px;font-family:'Caveat',cursive;
+      font-size:1rem;color:#7aab7a;border-radius:2px;
+      opacity:0;pointer-events:none;z-index:1500;
+      transition:opacity .5s,transform .5s;white-space:nowrap;
+    }
+    #whisper.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+    /* candle easter egg */
+    .candle-scene{cursor:none}
+
+    body{animation:pageIn .5s ease}
+    @keyframes pageIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+    body.leaving{animation:leaveOut .4s ease forwards}
+    @keyframes leaveOut{to{opacity:0;transform:scale(1.02)}}
+
+    .enter{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s}
+    .enter.vis{opacity:1;transform:translateY(0)}
+
+    @media(max-width:680px){
+      section{padding:60px 24px}
+      nav{padding:0 20px}
+      .gallery-wall{padding:32px 20px 40px}
+      .bottle-shelf{gap:28px}
+      .annotation{display:none}
+      .candle-scene{top:60px;right:24px}
+    }
+  </style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="mood-flash"></div>
+<div id="whisper"></div>
+
+<nav>
+  <a class="back" href="index.html">← Back</a>
+  <a href="le-labo.html">Le Labo</a>
+  <a class="active" href="diptyque.html">Diptyque</a>
+  <a href="notes.html">Field Notes</a>
+</nav>
+
+<!-- HERO -->
+<div class="room-hero">
+  <div class="ink-layer" id="ink-layer"></div>
+
+  <div class="candle-scene" id="candle" title="double-click me">
+    <div class="candle-glow"></div>
+    <div class="flame" id="flame"></div>
+    <div class="candle-body"></div>
+  </div>
+
+  <div class="hero-eyebrow">Paris · Est. 1961</div>
+  <h1 class="hero-title">Diptyque</h1>
+  <div class="brush-stroke"></div>
+  <p class="hero-sub">Ink into water. A pencil tracing tree rings. Three friends — a painter, a decorator, a textile designer — and a shop on Boulevard Saint-Germain.</p>
+  <div class="hero-scroll">↓ enter the salon</div>
+</div>
+
+<!-- BOTTLES -->
+<section id="bottles">
+  <h2 class="enter">The Collection</h2>
+  <p class="s-sub enter">hover to read the notes — click to release them</p>
+  <div class="bottle-shelf" id="bottle-shelf"></div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <h2 class="enter">The Salon</h2>
+  <p class="s-sub enter">interior frames — double-click to keep</p>
+  <div class="tags enter">
+    <span class="tag">Lived-in Parisian salon</span>
+    <span class="tag">Sourced in France</span>
+    <span class="tag">Nature & ink</span>
+    <span class="tag">Formally warm</span>
+    <span class="tag">Hespérides seasonal</span>
+    <span class="tag">~50% Asian clientele</span>
+  </div>
+  <div class="gallery-wall enter">
+    <div class="scatter" id="dip-scatter"></div>
+  </div>
+</section>
+
+<!-- SALON NOTE -->
+<section id="salon-note">
+  <div class="type-block enter">
+    <p>Three founders. A painter, a fabric designer, an interior decorator. They opened a shop in 1961 that sold whatever they found beautiful. The scent came almost as an afterthought — and became everything.</p>
+    <p>The interaction started formal. It got warm once we were honest. That's very Diptyque.</p>
+    <div class="author">— field notes from my visit to Diptyque NYC</div>
+  </div>
+</section>
+
+<script>
+/* ── cursor ── */
+const cur = document.getElementById('cur');
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+document.addEventListener('mousedown', () => cur.classList.add('wide'));
+document.addEventListener('mouseup',   () => cur.classList.remove('wide'));
+
+/* ── nav leave ── */
+document.querySelectorAll('a[href]').forEach(a => {
+  a.addEventListener('click', e => {
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#')) return;
+    e.preventDefault();
+    document.body.classList.add('leaving');
+    setTimeout(() => window.location = href, 400);
+  });
+});
+
+/* ── ink background drips ── */
+const inkLayer = document.getElementById('ink-layer');
+for (let i = 0; i < 7; i++) {
+  const d = document.createElement('div');
+  d.className = 'ink-drip';
+  const size = 80 + Math.random() * 160;
+  d.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${6+Math.random()*8}s;--delay:${Math.random()*5}s`;
+  inkLayer.appendChild(d);
+}
+
+/* ── bottles ── */
+const bottles = [
+  {
+    name: 'Do Son',
+    img: 'images/perfumes/dip-doson.png',
+    mood: 'rgba(240,200,200,.1)',
+    annotation: 'a tuberose soaked in sea air — you smell like you just arrived from the coast',
+    top: ['tuberose', 'orange blossom', 'iris'],
+    heart: ['tuberose absolute'],
+    base: ['white musk', 'sandalwood'],
+  },
+  {
+    name: 'Fleur de Peau',
+    img: 'images/perfumes/dip-fleurdepeau.png',
+    mood: 'rgba(200,190,230,.1)',
+    annotation: 'the closest a perfume has come to smelling like skin. your skin, specifically.',
+    top: ['aldehydes', 'iris', 'bergamot'],
+    heart: ['musks', 'ambrette'],
+    base: ['sandalwood', 'amber'],
+  },
+  {
+    name: 'Orphéon',
+    img: 'images/perfumes/dip-orpheon.png',
+    mood: 'rgba(180,210,180,.1)',
+    annotation: 'named after a jazz club near the original shop. bright, smoky, a little nostalgic.',
+    top: ['orange', 'lavender', 'pink pepper'],
+    heart: ['iris', 'cedarwood'],
+    base: ['musks', 'amber', 'vetiver'],
+  },
+];
+
+const shelf = document.getElementById('bottle-shelf');
+bottles.forEach(b => {
+  const card = document.createElement('div');
+  card.className = 'bottle-card';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'bottle-img-wrap';
+
+  const img = document.createElement('img');
+  img.className = 'bottle-img';
+  img.src = b.img;
+  img.alt = b.name;
+
+  const glow = document.createElement('div');
+  glow.className = 'bottle-glow';
+
+  // gentle tilt
+  wrap.addEventListener('mousemove', e => {
+    const r = wrap.getBoundingClientRect();
+    const dx = (e.clientX - r.left - r.width/2) / (r.width/2);
+    const dy = (e.clientY - r.top  - r.height/2) / (r.height/2);
+    img.style.transform = `rotate3d(${-dy*.5},${dx*.5},0,8deg)`;
+  });
+  wrap.addEventListener('mouseleave', () => { img.style.transform = ''; });
+
+  wrap.appendChild(img);
+  wrap.appendChild(glow);
+
+  const label = document.createElement('div');
+  label.className = 'bottle-label';
+  label.innerHTML = `
+    <div class="bottle-name">${b.name}</div>
+    <div class="notes-pyramid">
+      <div class="note-row"><span class="note-tier">Top</span><span class="note-words">${b.top.join(', ')}</span></div>
+      <div class="note-row"><span class="note-tier">Mid</span><span class="note-words">${b.heart.join(', ')}</span></div>
+      <div class="note-row"><span class="note-tier">Base</span><span class="note-words">${b.base.join(', ')}</span></div>
+    </div>
+  `;
+
+  const inkBtn = document.createElement('button');
+  inkBtn.className = 'ink-btn';
+  inkBtn.textContent = '✦ release the notes';
+  inkBtn.addEventListener('click', () => releaseNotes(b, wrap));
+  label.appendChild(inkBtn);
+
+  // annotation
+  const ann = document.createElement('div');
+  ann.className = 'annotation';
+  ann.textContent = b.annotation;
+
+  card.appendChild(wrap);
+  card.appendChild(label);
+  card.appendChild(ann);
+  shelf.appendChild(card);
+});
+
+function releaseNotes(b, originEl) {
+  const rect = originEl.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top  + rect.height / 2;
+
+  const allNotes = [...b.top, ...b.heart, ...b.base];
+  allNotes.forEach((word, i) => {
+    const span = document.createElement('span');
+    span.className = 'spray-word';
+    span.textContent = word;
+    const angle = (i / allNotes.length) * 360 + Math.random() * 25;
+    const dist  = 80 + Math.random() * 130;
+    const tx    = Math.cos(angle * Math.PI / 180) * dist;
+    const ty    = Math.sin(angle * Math.PI / 180) * dist - 50;
+    const dur   = (.8 + Math.random() * .5).toFixed(2);
+    span.style.cssText = `left:${cx}px;top:${cy}px;--tx:${tx}px;--ty:${ty}px;--dur:${dur}s`;
+    document.body.appendChild(span);
+    setTimeout(() => span.remove(), parseFloat(dur)*1000 + 200);
+  });
+
+  const flash = document.getElementById('mood-flash');
+  flash.style.background = b.mood;
+  flash.style.opacity = '1';
+  setTimeout(() => flash.style.opacity = '0', 600);
+
+  showWhisper(`${b.name} — breathe it in 🌿`);
+}
+
+/* ── gallery ── */
+const dipSrcs = [
+  'images/diptyque/DSCN0966.JPG','images/diptyque/DSCN0967.JPG',
+  'images/diptyque/DSCN0968.JPG','images/diptyque/DSCN0969.JPG',
+  'images/diptyque/DSCN0970.JPG','images/diptyque/DSCN0971.JPG',
+  'images/diptyque/DSCN0972.JPG','images/diptyque/DSCN0973.JPG',
+  'images/diptyque/DSCN0974.JPG','images/diptyque/DSCN0975.JPG',
+  'images/diptyque/DSCN0976.JPG','images/diptyque/DSCN0977.JPG',
+  'images/diptyque/DSCN0978.JPG','images/diptyque/DSCN0980.JPG',
+  'images/diptyque/DSCN0981.JPG',
+];
+
+const dipAnnotations = [
+  'hardwood floors, afternoon light',
+  'the candle burns slowly here',
+  'every object placed with intention',
+  'it smells like a library',
+  'the founder was a painter — you feel it',
+  'a salon, not a store',
+  'ink and cedar and old paper',
+  'the kind of quiet that costs something',
+  'they sourced the wood from France',
+  'you want to slow down in here',
+  'green walls, white shelves',
+  'a living room that sells perfume',
+  'the light is always golden',
+  'nothing superfluous',
+  'even the packaging feels considered',
+];
+
+const scatter = document.getElementById('dip-scatter');
+dipSrcs.forEach((src, i) => {
+  const card = document.createElement('div');
+  card.className = 'card enter';
+  const r  = (Math.random()*12-6).toFixed(2);
+  const ty = (Math.random()*8-4).toFixed(2);
+  card.style.cssText = `--r:${r}deg;--ty:${ty}px`;
+
+  const inkRing = document.createElement('div');
+  inkRing.className = 'ink-ring';
+
+  const heart = document.createElement('div');
+  heart.className = 'heart';
+  heart.textContent = '❤️';
+
+  const img = document.createElement('img');
+  img.src = src;
+  img.alt = `Diptyque interior ${i+1}`;
+  img.loading = 'lazy';
+
+  const num = document.createElement('div');
+  num.className = 'card-num';
+  num.textContent = dipAnnotations[i] || String(i+1).padStart(2,'0');
+
+  card.appendChild(inkRing);
+  card.appendChild(heart);
+  card.appendChild(img);
+  card.appendChild(num);
+
+  card.addEventListener('click', () => openLb(i));
+  card.addEventListener('dblclick', e => {
+    e.stopPropagation();
+    card.classList.toggle('loved');
+    showWhisper(card.classList.contains('loved') ? 'kept. 🌿' : 'released.');
+  });
+
+  scatter.appendChild(card);
+});
+
+/* ── lightbox ── */
+let lbIdx = 0;
+function openLb(idx) {
+  lbIdx = idx;
+  const card = scatter.querySelectorAll('.card')[idx];
+  if (card) {
+    card.classList.remove('inked');
+    void card.offsetWidth;
+    card.classList.add('inked');
+  }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'lb';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(2,5,2,.97);z-index:2000;display:flex;align-items:center;justify-content:center';
+  overlay.innerHTML = `
+    <button onclick="this.parentElement.remove()" style="position:absolute;top:20px;right:24px;background:none;border:none;color:rgba(200,230,200,.35);font-size:2rem;cursor:none;line-height:1;transition:color .2s;font-family:serif" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(200,230,200,.35)'">×</button>
+    <button onclick="shiftImg(-1)" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(200,230,200,.35);font-size:3rem;cursor:none;padding:16px 24px;font-family:serif;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(200,230,200,.35)'">‹</button>
+    <img id="lb-img" src="${dipSrcs[idx]}" style="max-width:88vw;max-height:85vh;object-fit:contain">
+    <button onclick="shiftImg(1)" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(200,230,200,.35);font-size:3rem;cursor:none;padding:16px 24px;font-family:serif;transition:color .2s" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(200,230,200,.35)'">›</button>
+    <span id="lb-ann" style="position:absolute;bottom:50px;left:50%;transform:translateX(-50%);font-family:Caveat,cursive;font-size:1.2rem;color:rgba(122,171,122,.5);white-space:nowrap">${dipAnnotations[idx] || ''}</span>
+    <span style="position:absolute;bottom:28px;left:50%;transform:translateX(-50%);font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.12em;color:rgba(255,255,255,.2);white-space:nowrap">Diptyque — ${String(idx+1).padStart(2,'0')} / ${dipSrcs.length}</span>
+  `;
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
+}
+
+function shiftImg(dir) {
+  lbIdx = (lbIdx + dir + dipSrcs.length) % dipSrcs.length;
+  const lb = document.getElementById('lb');
+  if (lb) {
+    lb.querySelector('#lb-img').src = dipSrcs[lbIdx];
+    lb.querySelector('#lb-ann').textContent = dipAnnotations[lbIdx] || '';
+    lb.querySelectorAll('span')[1].textContent = `Diptyque — ${String(lbIdx+1).padStart(2,'0')} / ${dipSrcs.length}`;
+  }
+}
+
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lb');
+  if (lb) {
+    if (e.key === 'ArrowRight') shiftImg(1);
+    if (e.key === 'ArrowLeft')  shiftImg(-1);
+    if (e.key === 'Escape')     lb.remove();
+  }
+});
+
+/* ── scroll entrance ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const cards = [...scatter.querySelectorAll('.card')];
+      const delay = cards.includes(e.target) ? cards.indexOf(e.target) * 50 : 0;
+      setTimeout(() => e.target.classList.add('vis'), delay);
+    }
+  });
+}, { threshold: 0.06 });
+document.querySelectorAll('.enter').forEach(el => io.observe(el));
+
+/* ── whisper ── */
+function showWhisper(msg) {
+  const w = document.getElementById('whisper');
+  w.textContent = msg;
+  w.classList.add('show');
+  setTimeout(() => w.classList.remove('show'), 3800);
+}
+
+/* ── candle blow-out easter egg ── */
+let litState = true;
+document.getElementById('candle').addEventListener('dblclick', () => {
+  const flame = document.getElementById('flame');
+  const glow  = document.querySelector('.candle-glow');
+  litState = !litState;
+  flame.style.opacity = litState ? '1' : '0';
+  glow.style.opacity  = litState ? '1' : '0';
+  showWhisper(litState ? 'you relit it. naturally. 🕯️' : 'you blew out the candle. very you.');
+});
+
+/* ── idle whisper ── */
+let idleT, idleI = 0;
+const idleMsgs = [
+  'tip: hover a bottle to read the notes. 🌿',
+  'double-click any photo to keep it. ❤️',
+  'the interaction gets better once you\'re honest.',
+  'they gave samples — but framed it as a feedback exchange.',
+];
+function resetIdle() {
+  clearTimeout(idleT);
+  idleT = setTimeout(() => { showWhisper(idleMsgs[idleI++ % idleMsgs.length]); resetIdle(); }, 14000);
+}
+document.addEventListener('mousemove', resetIdle);
+document.addEventListener('scroll', resetIdle, { passive: true });
+resetIdle();
+
+/* ── konami ── */
+const konamiSeq = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+let kPos = 0;
+document.addEventListener('keydown', e => {
+  if (e.key === konamiSeq[kPos]) { kPos++; if (kPos === konamiSeq.length) { eggKonami(); kPos = 0; } }
+  else kPos = 0;
+});
+function eggKonami() {
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(2,5,2,.97);z-index:3000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:40px;animation:pageIn .5s ease';
+  d.innerHTML = `
+    <div style="width:130px;height:130px;border:2px solid #7aab7a;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+      <span style="font-family:'Space Mono',monospace;font-size:.45rem;letter-spacing:.18em;color:#7aab7a;opacity:.5">ÉDITION SECRÈTE</span>
+      <span style="font-family:'Playfair Display',serif;font-style:italic;font-size:1.1rem;color:#7aab7a">No. 000</span>
+    </div>
+    <h3 style="font-family:'Caveat',cursive;font-size:2rem;color:rgba(200,230,200,.8)">the hidden accord</h3>
+    <p style="font-family:'Playfair Display',serif;font-style:italic;font-size:.9rem;opacity:.45;max-width:360px;line-height:1.8">top note: ink and curiosity.<br>heart: the warmth that follows honesty.<br>base: that feeling of being an insider.</p>
+    <button onclick="this.parentElement.remove()" style="background:none;border:1px solid rgba(122,171,122,.3);color:rgba(122,171,122,.4);font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:.18em;padding:9px 22px;cursor:none;margin-top:8px;transition:color .2s,border-color .2s">close</button>
+  `;
+  document.body.appendChild(d);
+}
+</script>
+<style>
+@keyframes pageIn{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:scale(1)}}
+</style>
+</body>
+</html>

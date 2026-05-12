@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /Users/sabriaislam -type d -name \"diptyque\" -o -type d -name \"le*labo\" -o -type d -name \"lelabo\" 2>/dev/null | head -20)",
+      "Read(//Users/sabriaislam/**)",
+      "Bash(mkdir -p /Users/sabriaislam/mcc-final/images/diptyque \"/Users/sabriaislam/mcc-final/images/le labo\")",
+      "Bash(cp /Users/sabriaislam/Desktop/pictures/diptyque/*.JPG /Users/sabriaislam/mcc-final/images/diptyque/)",
+      "Bash(cp \"/Users/sabriaislam/Desktop/pictures/le labo\"/*.JPG \"/Users/sabriaislam/mcc-final/images/le labo/\")",
+      "Bash(/bin/ls perfumes *)",
+      "Bash(python3 -c \"import os; print\\(os.listdir\\('/Users/sabriaislam/mcc-final/'\\)\\)\")",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}
